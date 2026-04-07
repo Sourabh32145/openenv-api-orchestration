@@ -1,0 +1,17 @@
+[project]
+name = "openenv-api-orchestration"
+version = "0.1.0"
+description = "OpenEnv environment for API orchestration under uncertainty"
+authors = [
+    {name = "Sourabh32145"}
+]
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "pydantic",
+    "openai"
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
