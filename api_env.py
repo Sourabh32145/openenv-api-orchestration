@@ -40,7 +40,7 @@ class APIEnv:
         elif action == "call_payment_api":
             if "auth" not in self.state["completed_tasks"]:
                 self.state["last_error"] = "auth_required"
-                reward = -0.1
+                reward = -0.3
             else:
                 reward = self._handle_payment()
 
@@ -53,10 +53,10 @@ class APIEnv:
 
         elif action == "retry":
             if self.state["last_error"]:
-                reward = 0.1
+                reward = 0.2
                 self.state["last_error"] = None
             else:
-                reward = -0.05
+                reward = -0.1
 
         elif action == "abort":
             return self._terminate(-0.5)
@@ -80,10 +80,13 @@ class APIEnv:
             self.state["pending_tasks"].remove(task)
             self.state["last_error"] = None
             return reward
+        else:
+            self.state["last_error"] = "already_completed"
+            return -0.1
         return 0  # IMPORTANT: no penalty for repeat
 
     def _handle_payment(self):
-        fail_prob = 0.0 if self.difficulty == "easy" else 0.4
+        fail_prob = 0.0 if self.difficulty == "easy" else 0.6
 
         if random.random() < fail_prob:
             self.state["failures"] += 1
