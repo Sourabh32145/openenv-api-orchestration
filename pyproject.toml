@@ -1,8 +1,7 @@
 [project]
-name = "openenv-api-orchestration"
+name = "openenv_api_orchestration"
 version = "0.1.0"
-description = "OpenEnv API orchestration environment"
-readme = "README.md"
+description = "OpenEnv API orchestration"
 requires-python = ">=3.10"
 
 dependencies = [
@@ -12,9 +11,5 @@ dependencies = [
     "openai"
 ]
 
-[tool.setuptools]
-packages = ["models"]
-
-[build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
+[tool.setuptools.packages.find]
+where = ["."]
