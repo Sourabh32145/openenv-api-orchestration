@@ -1,4 +1,25 @@
 name: api-orchestration-env
 description: Multi-step API orchestration under uncertainty
-
 entrypoint: server.py
+
+tasks:
+  - name: easy-task
+    description: "API orchestration with no failures"
+    difficulty: easy
+    graders:
+      - type: reward
+        threshold: 0.6
+
+  - name: medium-task
+    description: "API orchestration with random failures"
+    difficulty: medium
+    graders:
+      - type: reward
+        threshold: 0.4
+
+  - name: hard-task
+    description: "API orchestration with dependencies and failures"
+    difficulty: hard
+    graders:
+      - type: reward
+        threshold: 0.3
