@@ -1,25 +1,22 @@
-name: api-orchestration-env
-description: Multi-step API orchestration under uncertainty
-entrypoint: server.py
-
 tasks:
-  - name: easy-task
-    description: "API orchestration with no failures"
-    difficulty: easy
-    graders:
-      - type: reward
-        threshold: 0.6
+  - name: complete_workflow
+    description: Complete all API tasks successfully
+    grader:
+      type: final_state
+      condition:
+        completed_tasks: ["auth", "payment", "notify"]
 
-  - name: medium-task
-    description: "API orchestration with random failures"
-    difficulty: medium
-    graders:
-      - type: reward
-        threshold: 0.4
+  - name: correct_order
+    description: Ensure APIs are called in correct order
+    grader:
+      type: state_check
+      condition:
+        last_error: null
 
-  - name: hard-task
-    description: "API orchestration with dependencies and failures"
-    difficulty: hard
-    graders:
-      - type: reward
-        threshold: 0.3
+  - name: efficiency
+    description: Complete within minimal steps
+    grader:
+      type: numeric
+      field: step_count
+      operator: "<="
+      value: 5
