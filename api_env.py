@@ -108,3 +108,11 @@ class APIEnv:
     
     async def close(self):
         return
+    def grade_complete_workflow(state):
+        return set(state["completed_tasks"]) == {"auth", "payment", "notify"}
+
+    def grade_no_errors(state):
+        return state["last_error"] is None
+
+    def grade_efficiency(state):
+        return state["step_count"] <= 5
