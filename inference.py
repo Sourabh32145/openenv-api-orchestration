@@ -179,7 +179,11 @@ async def main() -> None:
 
             message = get_model_message(client, step, obs, last_reward, history)
 
-            result = await env.step({"action": message})
+            try:
+                result = await env.step(message)
+            except Exception as e:
+                print(f"[ERROR] step failed: {e}")
+                break
             obs = result["observation"]
 
             reward = result["reward"]
