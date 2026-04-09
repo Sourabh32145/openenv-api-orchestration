@@ -69,9 +69,9 @@ class APIEnv:
 
         info = {
             "graders": {
-                "complete_workflow": grade_complete_workflow(self.state),
-                "no_errors": grade_no_errors(self.state),
-                "efficient_execution": grade_efficiency(self.state),
+                "complete_workflow": self.grade_complete_workflow(self.state),
+                "no_errors": self.grade_no_errors(self.state),
+                "efficient_execution": self.grade_efficiency(self.state),
         }
     }
 
@@ -91,7 +91,6 @@ class APIEnv:
         else:
             self.state["last_error"] = "already_completed"
             return -0.1
-        return 0  # IMPORTANT: no penalty for repeat
 
     def _handle_payment(self):
         fail_prob = 0.0 if self.difficulty == "easy" else 0.6
@@ -116,11 +115,11 @@ class APIEnv:
     
     async def close(self):
         return
-    def grade_complete_workflow(state):
+    def grade_complete_workflow(self, state):
         return set(state["completed_tasks"]) == {"auth", "payment", "notify"}
 
-    def grade_no_errors(state):
+    def grade_no_errors(self, state):
         return state["last_error"] is None
 
-    def grade_efficiency(state):
+    def grade_efficiency(self, state):
         return state["step_count"] <= 5
