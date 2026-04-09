@@ -1,22 +1,21 @@
-tasks:
-  - id: task_1
-    description: Complete full workflow
-    grader:
-      type: final_state
-      expected:
-        completed_tasks: ["auth", "payment", "notify"]
+name: openenv_api_orchestration
 
-  - id: task_2
-    description: No errors during execution
-    grader:
-      type: state_field
-      field: last_error
-      expected: null
+env:
+  tasks:
+    - name: complete_workflow
+      description: Complete all API calls successfully
+      grader:
+        type: python
+        entry_point: grade_complete_workflow
 
-  - id: task_3
-    description: Efficient execution
-    grader:
-      type: numeric
-      field: step_count
-      operator: "<="
-      value: 5
+    - name: no_errors
+      description: No errors during execution
+      grader:
+        type: python
+        entry_point: grade_no_errors
+
+    - name: efficient_execution
+      description: Finish in minimal steps
+      grader:
+        type: python
+        entry_point: grade_efficiency
