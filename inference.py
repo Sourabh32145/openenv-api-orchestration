@@ -167,6 +167,7 @@ async def main() -> None:
     steps_taken = 0
     score = 0.0
     success = False
+    done = False
 
     log_start(task=TASK_NAME, env=BENCHMARK, model=MODEL_NAME)
 
@@ -180,15 +181,22 @@ async def main() -> None:
             message = get_model_message(client, step, obs, last_reward, history)
 
             try:
-                result = await env.step(message)
+                try:
+                    result = await env.step(message)
+                    if not isinstance(result, dict):
+                        print("[ERROR] Invalid result format")
+                        break
+                except Exception as e:
+                    print(f"[ERROR] step failed: {e}")
+                    break
             except Exception as e:
                 print(f"[ERROR] step failed: {e}")
                 break
-            obs = result["observation"]
+            obs = result.get("observation", {})
 
-            reward = result["reward"]
-            done = result["done"]
-            error = None
+            reward = result.get("reward", 0.0)
+            done = result.get("done", False)
+            error = result.get("info", {}).get("error", None)
 
             rewards.append(reward)
             steps_taken = step
