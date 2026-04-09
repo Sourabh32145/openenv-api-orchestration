@@ -55,7 +55,7 @@ API_KEY = os.getenv("HF_TOKEN") or os.getenv("API_KEY")
 
 API_BASE_URL = os.getenv("API_BASE_URL") or "https://router.huggingface.co/v1"
 MODEL_NAME = os.getenv("MODEL_NAME") or "Qwen/Qwen2.5-72B-Instruct"
-TASK_NAME = os.getenv("MY_ENV_V4_TASK", "echo")
+TASKS = ["task_1", "task_2", "task_3"]
 BENCHMARK = os.getenv("MY_ENV_V4_BENCHMARK", "my_env_v4")
 MAX_STEPS = 8
 TEMPERATURE = 0.7
@@ -157,68 +157,59 @@ def get_model_message(client: OpenAI, step: int, obs: dict, last_reward: float, 
         return "retry"
 
 
-async def main() -> None:
+async def main():
     client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
 
-    env = APIEnv()
+    for TASK_NAME in ["task_1", "task_2", "task_3"]:
 
-    history: List[str] = []
-    rewards: List[float] = []
-    steps_taken = 0
-    score = 0.0
-    success = False
-    done = False
+        env = APIEnv()
+        history = []
+        rewards = []
+        steps_taken = 0
+        score = 0.0
+        success = False
+        done = False
 
-    log_start(task=TASK_NAME, env=BENCHMARK, model=MODEL_NAME)
+        log_start(task=TASK_NAME, env=BENCHMARK, model=MODEL_NAME)
 
-    try:
-        result = await env.reset() # OpenENV.reset()
-        obs = result
-        last_reward = 0.0
+        try:
+            obs = await env.reset()
+            last_reward = 0.0
 
-        for step in range(1, MAX_STEPS + 1):
+            for step in range(1, MAX_STEPS + 1):
 
-            message = get_model_message(client, step, obs, last_reward, history)
+                message = get_model_message(client, step, obs, last_reward, history)
 
-            try:
                 try:
                     result = await env.step(message)
-                    if not isinstance(result, dict):
-                        print("[ERROR] Invalid result format")
-                        break
                 except Exception as e:
                     print(f"[ERROR] step failed: {e}")
                     break
-            except Exception as e:
-                print(f"[ERROR] step failed: {e}")
-                break
-            obs = result.get("observation", {})
 
-            reward = result.get("reward", 0.0)
-            done = result.get("done", False)
-            error = result.get("info", {}).get("error", None)
+                obs = result.get("observation", {})
+                reward = result.get("reward", 0.0)
+                done = result.get("done", False)
 
-            rewards.append(reward)
-            steps_taken = step
-            last_reward = reward
+                rewards.append(reward)
+                steps_taken = step
+                last_reward = reward
 
-            log_step(step=step, action=message, reward=reward, done=done, error=error)
+                log_step(step, message, reward, done, None)
 
-            history.append(f"Step {step}: {message!r} -> reward {reward:+.2f}")
+                if done:
+                    break
 
-            if done:
-                break
+            score = sum(rewards)
+            score = min(max(score, 0.0), 1.0)
+            success = done
 
-        score = sum(rewards)
-        score = min(max(score, 0.0), 1.0)
-        success = done
+        finally:
+            try:
+                await env.close()
+            except:
+                pass
 
-    finally:
-        try:
-            await env.close()
-        except Exception as e:
-            print(f"[DEBUG] env.close() error (container cleanup): {e}", flush=True)
-        log_end(success=success, steps=steps_taken, score=score, rewards=rewards)
+            log_end(success, steps_taken, score, rewards)
 
 
 if __name__ == "__main__":
