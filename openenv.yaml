@@ -1,26 +1,6 @@
 name: openenv_api_orchestration
 
 tasks:
-  - id: task_1
-    description: Complete all tasks successfully
-    grader:
-      type: python
-      code: |
-        def grade(obs, reward, done, info):
-            return done and set(obs["completed_tasks"]) == {"auth", "payment", "notify"}
-
-  - id: task_2
-    description: No errors during execution
-    grader:
-      type: python
-      code: |
-        def grade(obs, reward, done, info):
-            return obs["last_error"] is None
-
-  - id: task_3
-    description: Efficient execution
-    grader:
-      type: python
-      code: |
-        def grade(obs, reward, done, info):
-            return obs["step_count"] <= 5
+  - id: complete_workflow
+  - id: no_errors
+  - id: efficient_execution
