@@ -67,12 +67,20 @@ class APIEnv:
 
         done = len(self.state["completed_tasks"]) == 3
 
-        return {
-            "observation": self._get_obs(),
-            "reward": reward,
-            "done": done,
-            "info": {}
+        info = {
+            "graders": {
+                "complete_workflow": grade_complete_workflow(self.state),
+                "no_errors": grade_no_errors(self.state),
+                "efficient_execution": grade_efficiency(self.state),
         }
+    }
+
+    return {
+        "observation": self._get_obs(),
+        "reward": reward,
+        "done": done,
+        "info": info
+    }
 
     def _handle_success(self, task, reward):
         if task not in self.state["completed_tasks"]:
